@@ -73,9 +73,15 @@ export default function App() {
             if (token) {
               try {
                 const prefs = await getPreferences(token);
-                setPreferences(prefs);
+                if (prefs && prefs.preferences) {
+                  setPreferences(prefs.preferences);
+                } else {
+                  console.warn('No preferences found after onboarding');
+                  return;
+                }
               } catch (err) {
                 console.warn('Could not fetch preferences after onboarding', err);
+                return;
               }
             }
             setView("home");

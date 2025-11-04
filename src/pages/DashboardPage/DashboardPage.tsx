@@ -11,6 +11,14 @@ preferences,
 }) => {
     console.log("DashboardPage preferences:", preferences);
     console.log("DashboardPage token:", token);
+    
+    if (!preferences || !preferences.content) {
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <Typography color="white" variant="h6">Loading preferences...</Typography>
+            </Box>
+        );
+    }
   return (
     <Box
       sx={{
