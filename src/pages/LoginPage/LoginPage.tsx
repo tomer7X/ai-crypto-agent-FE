@@ -1,10 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Box,
   Button,
-  Checkbox,
   Container,
-  FormControlLabel,
   IconButton,
   InputAdornment,
   Link,
@@ -14,12 +12,11 @@ import {
   Typography,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { validateLogin} from "../../api";
+import { validateLogin } from "../../api";
 
 type FormState = {
   email: string;
   password: string;
-  remember: boolean;
 };
 
 const emailRegex =
@@ -33,7 +30,6 @@ export const Login = ({ onSwitchToRegister }: Props) => {
   const [form, setForm] = useState<FormState>({
     email: "",
     password: "",
-    remember: false,
   });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
@@ -136,27 +132,6 @@ export const Login = ({ onSwitchToRegister }: Props) => {
                 }}
               />
             </Stack>
-
-                      <Box sx={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={form.remember}
-                    onChange={(e) => setForm({ ...form, remember: e.target.checked })}
-                    color="primary"
-                  />
-                }
-                label="Remember me"
-              />
-              <Link
-                href="#"
-                onClick={(e) => e.preventDefault()}
-                variant="body2"
-                sx={{ alignSelf: "center" }}
-              >
-                Forgot password?
-              </Link>
-            </Box>
 
             <Button
               type="submit"

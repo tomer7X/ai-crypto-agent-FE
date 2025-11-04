@@ -39,6 +39,11 @@ export default function RegisterPage({ onSwitchToLogin }: Props) {
     return Object.keys(next).length === 0;
   }
 
+  function navigateToLogin(e?: React.MouseEvent) {
+    e?.preventDefault();
+    onSwitchToLogin?.();
+  }
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setMessage(null);
@@ -47,9 +52,15 @@ export default function RegisterPage({ onSwitchToLogin }: Props) {
     try {
       console.log("Register payload:", { fullName, email });
       await createAccount(fullName, email, password);
-      setMessage("✅ (Demo) Account created — you can now sign in");
-    } catch (err) {
-      setMessage("❌ Something went wrong");
+      setMessage("✅ Account created — you can now sign in");
+      setTimeout(() => {
+        navigateToLogin();
+      }, 2000);
+    } catch (err: any) {
+      console.log({err});
+      let errorMessage = err?.message || "Something went wrong";
+      errorMessage = errorMessage.replace(/^"|"$/g, '');
+      setMessage(`❌ ${errorMessage}`);
     } finally {
       setSubmitting(false);
     }
@@ -123,7 +134,7 @@ export default function RegisterPage({ onSwitchToLogin }: Props) {
 
               <Typography variant="body2" sx={{ textAlign: "center" }}>
                 Already have an account?{' '}
-                <Link href="#" onClick={(e) => { e.preventDefault(); onSwitchToLogin?.(); }}>
+                <Link href="#" onClick={navigateToLogin}>
                   Sign in
                 </Link>
               </Typography>
