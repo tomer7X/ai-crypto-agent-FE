@@ -24,9 +24,11 @@ const emailRegex =
 
 type Props = {
   onSwitchToRegister?: () => void;
+  /** Called with JWT token when login succeeds */
+  onLogin?: (token: string) => void;
 };
 
-export const Login = ({ onSwitchToRegister }: Props) => {
+export const Login = ({ onSwitchToRegister, onLogin }: Props) => {
   const [form, setForm] = useState<FormState>({
     email: "",
     password: "",
@@ -53,9 +55,18 @@ export const Login = ({ onSwitchToRegister }: Props) => {
     try {
       const response = await validateLogin(form.email, form.password);
       console.log("Login response:", response);
-      setMessage("✅ (Demo) Logged in successfully");
-    } catch (err) {
-      setMessage("❌ Something went wrong");
+      setMessage("✅ Logged in successfully");
+      // extract token from response (support common keys)
+      const token = response?.token || response?.accessToken || response?.jwt || response?.data?.token;
+      if (token) {
+        onLogin?.(token);
+      } else {
+        // still notify parent (no token) to preserve previous behavior
+        onLogin?.("");
+      }
+    } catch (err: any) {
+      const text = err?.message ? String(err.message) : "Something went wrong";
+      setMessage(`❌ ${text}`);
     } finally {
       setSubmitting(false);
     }

@@ -1,5 +1,91 @@
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
+export interface CryptoNewsItem {
+  id: number;
+  title: string;
+  published_at: string;
+  url: string;
+  source: string;
+  currencies?: { code: string; title: string }[];
+  votes?: { positive: number; negative: number; important: number };
+}
+
+export interface CryptoNewsResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: CryptoNewsItem[];
+}
+
+/**
+ * Fetch crypto news from the backend cryptopanic endpoint.
+ * @returns Promise<CryptoNewsResponse>
+ */
+export async function fetchCryptoNews(): Promise<CryptoNewsResponse> {
+  if (!API_BASE) {
+    throw new Error('API_BASE_URL not configured');
+  }
+
+  const res = await fetch(`${API_BASE}/api/news/cryptopanic`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      // Note: Add Authorization header here once auth is implemented
+    },
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Failed to fetch crypto news: ${text}`);
+  }
+
+  return res.json();
+}
+
+/**
+ * Get user preferences using JWT token.
+ */
+export async function getPreferences(token: string) {
+  if (!API_BASE) throw new Error("API_BASE_URL not configured");
+  const res = await fetch(`${API_BASE}/api/preferences`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (res.status === 404) return null; // no preferences yet
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Failed to get preferences: ${text}`);
+  }
+
+  return res.json();
+}
+
+/**
+ * Create or update user preferences using PUT and JWT token.
+ */
+export async function putPreferences(token: string, preferences: any) {
+  if (!API_BASE) throw new Error("API_BASE_URL not configured");
+  const res = await fetch(`${API_BASE}/api/preferences`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(preferences),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Failed to save preferences: ${text}`);
+  }
+
+  return res.json();
+}
+
 export async function createAccount(fullName: string, email: string, password: string) {
   const res = await fetch(`${API_BASE}/auth/register`, {
     method: "POST",
@@ -28,7 +114,7 @@ export async function validateLogin(email: string, password: string) {
 
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(`Failed to login account: ${text}`);
+    throw new Error(text);
   }
 
   return res.json();

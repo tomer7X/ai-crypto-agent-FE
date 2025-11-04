@@ -55,11 +55,10 @@ export default function RegisterPage({ onSwitchToLogin }: Props) {
       setMessage("✅ Account created — you can now sign in");
       setTimeout(() => {
         navigateToLogin();
-      }, 2000);
+      }, 300);
     } catch (err: any) {
       console.log({err});
-      let errorMessage = err?.message || "Something went wrong";
-      errorMessage = errorMessage.replace(/^"|"$/g, '');
+      let errorMessage = JSON.parse(err.message).error || "Something went wrong";
       setMessage(`❌ ${errorMessage}`);
     } finally {
       setSubmitting(false);
