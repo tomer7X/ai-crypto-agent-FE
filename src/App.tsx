@@ -1,19 +1,28 @@
 import { useState, useEffect } from "react";
 import LoginPage from "./pages/LoginPage/LoginPage.tsx";
 import RegisterPage from "./pages/RegisterPage/RegisterPage.tsx";
-import { fetchCryptoNews, getPreferences } from './api';
+import { getPreferences } from './api';
 import OnboardingPage from "./pages/OnboardingPage/OnboardingPage.tsx";
+import { DashboardPage } from "./pages/DashboardPage/DashboardPage.tsx";
 import Particles from './Particles';
 
 export type Pages = "login" | "register" | "onboarding" | "home";
 
+export interface Preferences {
+  id: number;
+  userId: number;
+  currencies: string[];
+  investorType: string;
+  content: string[];
+}
+
 export default function App() {
   const [view, setView] = useState<Pages>("login");
   const [token, setToken] = useState<string | null>(null);
-  const [preferences, setPreferences] = useState<any | null>(null);
+  const [preferences, setPreferences] = useState<Preferences | null>(null);
 
   async function handleLogin(jwt: string) {
-    setToken(jwt || null);
+    setToken(jwt ?? null);
     if (!jwt) {
       // no token returned -- show onboarding to collect preferences locally
       setView("onboarding");
@@ -23,7 +32,7 @@ export default function App() {
     try {
       const prefs = await getPreferences(jwt);
       if (prefs) {
-        setPreferences(prefs);
+        setPreferences(prefs.preferences);
         setView("home");
       } else {
         setView("onboarding");
@@ -34,23 +43,9 @@ export default function App() {
     }
   }
 
-  // Fetch crypto news in the background when app loads
-  useEffect(() => {
-    async function fetchNews() {
-      try {
-        const news = await fetchCryptoNews();
-        console.log('Fetched crypto news:', news);
-        // TODO: Store news in state/context when we build the news UI
-      } catch (err) {
-        console.error('Failed to fetch crypto news:', err);
-      }
-    }
-    fetchNews();
-  }, []); // Empty deps array = run once when component mounts
-
   return (
     <>
-    <div style={{ width: '100%', height: '100vh', position: 'relative', backgroundColor: '#121212ff' }}>
+    <div style={{ width: '100%', height: '100vh', position: 'fixed', top: 0, left: 0, backgroundColor: '#121212ff' }}>
         <Particles
           particleColors={["#9d00ffff", "#9d00ffff"]}
           particleCount={2000}
@@ -63,32 +58,32 @@ export default function App() {
         />
       </div>
 
-      {view === "login" && (
-        <LoginPage onSwitchToRegister={() => setView("register")} onLogin={(jwt) => handleLogin(jwt)} />
-      )}
+      <div style={{ position: 'relative', zIndex: 2, width: '100%', minHeight: '100vh' }}>
+        {view === "login" && (
+          <LoginPage onSwitchToRegister={() => setView("register")} onLogin={(jwt) => handleLogin(jwt)} />
+        )}
 
-      {view === "register" && (
-        <RegisterPage onSwitchToLogin={() => setView("login")} />
-      )}
+        {view === "register" && (
+          <RegisterPage onSwitchToLogin={() => setView("login")} />
+        )}
 
-      {view === "onboarding" && (
-        <OnboardingPage token={token || undefined} onComplete={async () => {
-          // after onboarding completes, try to fetch preferences (if token available) or read local saved
-          if (token) {
-            try {
-              const prefs = await getPreferences(token);
-              setPreferences(prefs);
-            } catch (err) {
-              console.warn('Could not fetch preferences after onboarding', err);
+        {view === "onboarding" && (
+          <OnboardingPage token={token || undefined} onComplete={async () => {
+            // after onboarding completes, try to fetch preferences (if token available) or read local saved
+            if (token) {
+              try {
+                const prefs = await getPreferences(token);
+                setPreferences(prefs);
+              } catch (err) {
+                console.warn('Could not fetch preferences after onboarding', err);
+              }
             }
-          }
-          setView("home");
-        }} />
-      )}
+            setView("home");
+          }} />
+        )}
 
-      {view === "home" && (
-        console.log('we on home page now.')
-      )}
+        {view === "home" && <DashboardPage token={token!} preferences={preferences!}/>}
+      </div>
     </>
   );
 }
