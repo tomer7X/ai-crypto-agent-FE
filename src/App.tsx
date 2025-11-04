@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Box, Typography } from "@mui/material";
 import LoginPage from "./pages/LoginPage/LoginPage.tsx";
 import RegisterPage from "./pages/RegisterPage/RegisterPage.tsx";
 import { getPreferences } from './api';
@@ -22,19 +23,22 @@ export default function App() {
   const [preferences, setPreferences] = useState<Preferences | null>(null);
 
   async function handleLogin(jwt: string) {
-    setToken(jwt ?? null);
     if (!jwt) {
-      // no token returned -- show onboarding to collect preferences locally
-      setView("onboarding");
+      console.error("No token received during login");
       return;
     }
 
+    setToken(jwt);
+
     try {
       const prefs = await getPreferences(jwt);
-      if (prefs) {
+      console.log("Received preferences:", prefs);
+
+      if (prefs && prefs.preferences) {
         setPreferences(prefs.preferences);
         setView("home");
       } else {
+        console.log("No preferences found, redirecting to onboarding");
         setView("onboarding");
       }
     } catch (err) {
@@ -88,7 +92,13 @@ export default function App() {
           }} />
         )}
 
-        {view === "home" && <DashboardPage token={token!} preferences={preferences!}/>}
+        {view === "home" && token && preferences ? (
+          <DashboardPage token={token} preferences={preferences}/>
+        ) : view === "home" ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+            <Typography color="white" variant="h6">Loading dashboard...</Typography>
+          </Box>
+        ) : null}
       </div>
     </>
   );

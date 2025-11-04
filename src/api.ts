@@ -26,6 +26,8 @@ export async function fetchCryptoNews(): Promise<CryptoNewsResponse> {
     throw new Error('API_BASE_URL not configured');
   }
 
+  console.log('Fetching news from:', `${API_BASE}/api/news/cryptopanic`);
+  
   const res = await fetch(`${API_BASE}/api/news/cryptopanic`, {
     method: "GET",
     headers: {
@@ -36,10 +38,41 @@ export async function fetchCryptoNews(): Promise<CryptoNewsResponse> {
 
   if (!res.ok) {
     const text = await res.text();
+    console.error('News API error response:', text);
     throw new Error(`Failed to fetch crypto news: ${text}`);
   }
 
-  return res.json();
+  const data = (await res.json()).data;
+  console.log('Raw API response:', data);
+
+  // Validate response structure
+  if (!data || typeof data !== 'object') {
+    throw new Error('Invalid response format: not an object');
+  }
+
+  const results = data.results;
+  if (!Array.isArray(results)) {
+    throw new Error('Invalid response format: results is not an array');
+  }
+
+
+  // Map and validate each news item
+  const validatedResults = results.map((item: any) => ({
+    id: item.id || Date.now(), // Fallback to timestamp if no ID
+    title: item.title || 'Untitled',
+    published_at: item.published_at || new Date().toISOString(),
+    url: item.url || '#',
+    source: item.source || 'Unknown Source',
+    currencies: Array.isArray(item.currencies) ? item.currencies : [],
+    votes: item.votes || { positive: 0, negative: 0, important: 0 }
+  }));
+
+  return {
+    count: data.count || validatedResults.length,
+    next: data.next || null,
+    previous: data.previous || null,
+    results: validatedResults
+  };
 }
 
 /**
