@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -14,6 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { validateLogin} from "../../api";
 
 type FormState = {
   email: string;
@@ -24,7 +25,11 @@ type FormState = {
 const emailRegex =
   /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
-export const Login = () => {
+type Props = {
+  onSwitchToRegister?: () => void;
+};
+
+export const Login = ({ onSwitchToRegister }: Props) => {
   const [form, setForm] = useState<FormState>({
     email: "",
     password: "",
@@ -50,9 +55,8 @@ export const Login = () => {
     if (!validate()) return;
     setSubmitting(true);
     try {
-      // Placeholder (no backend yet). Replace with fetch to your API later.
-      console.log("Login payload:", form);
-      await new Promise(r => setTimeout(r, 600)); // fake latency
+      const response = await validateLogin(form.email, form.password);
+      console.log("Login response:", response);
       setMessage("✅ (Demo) Logged in successfully");
     } catch (err) {
       setMessage("❌ Something went wrong");
@@ -169,7 +173,7 @@ export const Login = () => {
                 color={message.includes("✅") ? "success" : "error"}
                 variant="body2"
                 sx={{ mt: 2, textAlign: "center" }}
-              >
+              > 
                 {message}
               </Typography>
             )}
@@ -179,7 +183,10 @@ export const Login = () => {
             Don't have an account?{" "}
             <Link
               href="#"
-              onClick={(e) => e.preventDefault()}
+              onClick={(e) => {
+                e.preventDefault();
+                onSwitchToRegister?.();
+              }}
               variant="body2"
             >
               Create one
