@@ -1,6 +1,9 @@
 import { Box, Typography } from '@mui/material';
-import { FloatingCard } from '../../components/FloatingCard';
 import type { Preferences } from '../../App';
+import { MarketNewsCard } from '../../components/dashboard/MarketNewsCard';
+import { ChartsCard } from '../../components/dashboard/ChartsCard';
+import { SocialCard } from '../../components/dashboard/SocialCard';
+import { FunTimeCard } from '../../components/dashboard/FunTimeCard';
 
 export const DashboardPage = ({
 token,
@@ -44,35 +47,16 @@ preferences,
           gap: 3,
         }}
       >
+        {/* Top Row */}
         <Box sx={{ display: 'flex', gap: 3, flex: 1 }}>
-            {preferences.content.includes('news') &&           
-          <FloatingCard title="Market News">
-            <Typography color="white" variant="body2">
-              Coming soon: Market News
-            </Typography>
-          </FloatingCard>
-          }
-
-          {preferences.content.includes('charts') && <FloatingCard title="Charts">
-            <Typography color="white" variant="body2">
-              Coming soon: Live market data and trends
-            </Typography>
-          </FloatingCard>}
+          <MarketNewsCard preferences={preferences} />
+          <ChartsCard preferences={preferences} />
         </Box>
 
         {/* Bottom Row */}
         <Box sx={{ display: 'flex', gap: 3, flex: 1 }}>
-          {preferences.content.includes('social') && <FloatingCard title="Social">
-            <Typography color="white" variant="body2">
-              Coming soon: Latest crypto news and updates
-            </Typography>
-          </FloatingCard>}
-
-          {preferences.content.includes('fun') && <FloatingCard title="Fun Time">
-            <Typography color="white" variant="body2">
-              Coming soon: Quick trade actions and alerts
-            </Typography>
-          </FloatingCard>}
+          <SocialCard preferences={preferences} />
+          <FunTimeCard preferences={preferences} />
         </Box>
       </Box>
     </Box>
