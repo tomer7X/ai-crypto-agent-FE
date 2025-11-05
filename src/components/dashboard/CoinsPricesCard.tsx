@@ -1,8 +1,7 @@
-import { Box, Chip, Skeleton, Stack, Typography, Badge } from '@mui/material';
+import { Box, Skeleton, Stack, Typography } from '@mui/material';
 import { FloatingCard } from '../FloatingCard';
 import { useUserData } from '../../context/useUserDataProvider';
 import { useCoinPricesQuery } from '../../hooks/queries';
-import { WidthWide } from '@mui/icons-material';
 
 export const CoinsPricesCard = () => {
   const { preferences } = useUserData();
