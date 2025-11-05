@@ -26,7 +26,7 @@ const emailRegex =
 type Props = {
   onSwitchToRegister?: () => void;
   /** Called with JWT token when login succeeds */
-  onLogin?: (token: string) => void;
+  onLogin: (token: string, expirationDate: Date) => void;
 };
 
 export const Login = ({ onSwitchToRegister, onLogin }: Props) => {
@@ -56,16 +56,10 @@ export const Login = ({ onSwitchToRegister, onLogin }: Props) => {
     setSubmitting(true);
     try {
       const response = await loginMutation.mutateAsync({ email: form.email, password: form.password });
-      console.log("Login response:", response);
       setMessage("✅ Logged in successfully");
-      // extract token from response (support common keys)
-      const token = response?.token || response?.accessToken || response?.jwt || response?.data?.token;
-      if (token) {
-        onLogin?.(token);
-      } else {
-        // still notify parent (no token) to preserve previous behavior
-        onLogin?.("");
-      }
+      const token = response?.token;
+      const expirationDate = response?.tokenExpirationDate;
+      onLogin(token, expirationDate);
     } catch (err: any) {
       const text = err?.message ? String(err.message) : "Something went wrong";
       setMessage(`❌ ${text}`);

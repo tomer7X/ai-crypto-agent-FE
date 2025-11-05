@@ -28,17 +28,32 @@ export default function App() {
   // React Query: load preferences when token exists
   const { data: prefsData, isLoading: prefsLoading } = usePreferencesQuery(token || undefined, !!token);
 
+  useEffect(() => {
+    const tokenFromLocalStorage = localStorage.getItem("accessToken");
+    const tokenExpirationDate = localStorage.getItem("TokenExpirationDate");
+    if (tokenExpirationDate && new Date(tokenExpirationDate) < new Date()) {
+      // Token expired, clear it from localStorage
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("TokenExpirationDate");
+      return;
+    }
+    
+    if (tokenFromLocalStorage) {
+      setToken(tokenFromLocalStorage);
+    }
+  }, [setToken]);
+
   // React Query side-effect: decide where to route once preferences are known
   useEffect(() => {
     if (!token) return;
-
+    
     // While loading, show the dashboard loader if we're already on home
     if (prefsLoading) {
       // Ensure we are on a loading-friendly view
       if (view !== 'home') setView('home');
       return;
     }
-
+    
     // After loading completes, route based on data
     if (prefsData && (prefsData as any).preferences) {
       setPreferences((prefsData as any).preferences);
@@ -46,15 +61,17 @@ export default function App() {
     } else {
       setView('onboarding');
     }
-  }, [token, prefsLoading, prefsData]);
-
-  async function handleLogin(jwt: string) {
+  }, [token, prefsLoading, prefsData]);  
+  
+  async function handleLogin(jwt: string, expirationDate: Date) {
     if (!jwt) {
       console.error("No token received during login");
       return;
     }
 
     setToken(jwt);
+    localStorage.setItem("accessToken", jwt);
+    localStorage.setItem("TokenExpirationDate", expirationDate.toISOString());
 
     // Switch to home to show loader while React Query fetches preferences
     setView('home');
@@ -104,7 +121,7 @@ export default function App() {
           </Typography>
       )}
         {view === "login" ? (
-          <LoginPage onSwitchToRegister={() => setView("register")} onLogin={(jwt) => handleLogin(jwt)} />
+          <LoginPage onSwitchToRegister={() => setView("register")} onLogin={(jwt, expirationDate) => handleLogin(jwt, expirationDate)} />
         ) : null}
 
         {view === "register" ? (
