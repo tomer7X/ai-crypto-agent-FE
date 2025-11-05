@@ -61,7 +61,7 @@ export const Login = ({ onSwitchToRegister, onLogin }: Props) => {
       const expirationDate = response?.tokenExpirationDate;
       onLogin(token, expirationDate);
     } catch (err: any) {
-      const text = err?.message ? String(err.message) : "Something went wrong";
+      const text = JSON.parse(err.message).error ? String(err.message) : "Something went wrong";
       setMessage(`❌ ${text}`);
     } finally {
       setSubmitting(false);

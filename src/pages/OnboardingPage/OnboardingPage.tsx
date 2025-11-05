@@ -37,13 +37,13 @@ const INVESTOR_TYPES = [
 
 
 export default function OnboardingPage({ onComplete }: Props) {
-  const { token, preferences } = useUserData();
+  const { token, preferences, setPreferences } = useUserData();
   const [assets, setAssets] = useState<string[]>([]);
   const [investorType, setInvestorType] = useState<string>("HODLer");
   const [content, setContent] = useState<{ [k: string]: boolean }>({
     news: true,
     charts: true,
-    social: true,
+    AI: true,
     fun: true,
   });
   const [submitting, setSubmitting] = useState(false);
@@ -59,7 +59,7 @@ export default function OnboardingPage({ onComplete }: Props) {
       setContent({
         news: false,
         charts: false,
-        social: false,
+        AI: false,
         fun: false,
         ...selectedContent
     });
@@ -84,6 +84,7 @@ export default function OnboardingPage({ onComplete }: Props) {
           content: selectedContent,
         });
       }
+      setPreferences(null); // Reset before setting new prefs to trigger loading
 
       setMessage("✅ Preferences saved");
       setTimeout(() => onComplete?.(), 700);
