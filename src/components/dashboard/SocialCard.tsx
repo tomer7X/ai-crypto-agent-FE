@@ -1,13 +1,10 @@
 import { Typography } from '@mui/material';
 import { FloatingCard } from '../FloatingCard';
-import type { Preferences } from '../../App';
+import { useUserData } from '../../context/useUserDataProvider';
 
-interface SocialCardProps {
-  preferences: Preferences;
-}
-
-export const SocialCard = ({ preferences }: SocialCardProps) => {
-  if (!preferences.content.includes('social')) return null;
+export const SocialCard = () => {
+const { preferences } = useUserData();
+    if (!preferences!.content.includes('social')) return null;
 
   return (
     <FloatingCard title="Social">

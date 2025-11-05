@@ -1,13 +1,10 @@
 import { Typography } from '@mui/material';
 import { FloatingCard } from '../FloatingCard';
-import type { Preferences } from '../../App';
+import { useUserData } from '../../context/useUserDataProvider';
 
-interface ChartsCardProps {
-  preferences: Preferences;
-}
-
-export const CoinsPricesCard = ({ preferences }: ChartsCardProps) => {
-  if (!preferences.content.includes('charts')) return null;
+export const CoinsPricesCard = () => {
+  const { preferences } = useUserData();
+  if (!preferences!.content.includes('charts')) return null;
 
   return (
     <FloatingCard title="Coins Prices">

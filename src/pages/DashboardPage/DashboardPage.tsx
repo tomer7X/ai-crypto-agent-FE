@@ -1,20 +1,10 @@
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import { MarketNewsCard } from '../../components/dashboard/MarketNewsCard';
 import { CoinsPricesCard } from '../../components/dashboard/CoinsPricesCard';
 import { SocialCard } from '../../components/dashboard/SocialCard';
 import { FunTimeCard } from '../../components/dashboard/FunTimeCard';
-import { useUserData } from '../../context/useUserDataProvider';
 
 export const DashboardPage = () => {
-  const { preferences } = useUserData();
-    
-    if (!preferences || !preferences.content) {
-        return (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                <Typography color="white" variant="h6">Loading preferences...</Typography>
-            </Box>
-        );
-    }
   return (
     <Box
       sx={{
@@ -42,14 +32,14 @@ export const DashboardPage = () => {
       >
         {/* Top Row */}
         <Box sx={{ display: 'flex', gap: 3, flex: 1 }}>
-          <MarketNewsCard preferences={preferences} />
-          <CoinsPricesCard preferences={preferences} />
+          <MarketNewsCard/>
+          <CoinsPricesCard/>
         </Box>
 
         {/* Bottom Row */}
         <Box sx={{ display: 'flex', gap: 3, flex: 1 }}>
-          <SocialCard preferences={preferences} />
-          <FunTimeCard preferences={preferences} />
+          <SocialCard  />
+          <FunTimeCard />
         </Box>
       </Box>
     </Box>

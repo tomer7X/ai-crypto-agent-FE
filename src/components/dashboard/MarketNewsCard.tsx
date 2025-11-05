@@ -1,17 +1,15 @@
 import { Box, Typography, CircularProgress, IconButton } from '@mui/material';
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { FloatingCard } from '../FloatingCard';
-import type { Preferences } from '../../App';
 import type { CryptoNewsItem } from '../../api';
 import { useCryptoNewsQuery } from '../../hooks/queries';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { useUserData } from '../../context/useUserDataProvider';
 
-interface MarketNewsCardProps {
-  preferences: Preferences;
-}
 
-export const MarketNewsCard = ({ preferences }: MarketNewsCardProps) => {
+export const MarketNewsCard = () => {
+  const {preferences} = useUserData();
   const { data, isLoading, isError, error } = useCryptoNewsQuery();
   const news: CryptoNewsItem[] = data?.results ?? [];
   const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
@@ -48,7 +46,7 @@ export const MarketNewsCard = ({ preferences }: MarketNewsCardProps) => {
     }, 5000);
   }, [news.length]);
 
-  if (!preferences.content.includes('news')) return null;
+  if (!preferences!.content.includes('news')) return null;
 
   return (
     <FloatingCard title="Market News" sx={{ height: '100%', minHeight: '45vh' }}>

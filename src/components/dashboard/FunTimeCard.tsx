@@ -1,13 +1,11 @@
 import { Typography } from '@mui/material';
 import { FloatingCard } from '../FloatingCard';
-import type { Preferences } from '../../App';
+import { useUserData } from '../../context/useUserDataProvider';
 
-interface FunTimeCardProps {
-  preferences: Preferences;
-}
 
-export const FunTimeCard = ({ preferences }: FunTimeCardProps) => {
-  if (!preferences.content.includes('fun')) return null;
+export const FunTimeCard = () => {
+  const { preferences } = useUserData();
+  if (!preferences!.content.includes('fun')) return null;
 
   return (
     <FloatingCard title="Fun Time">
