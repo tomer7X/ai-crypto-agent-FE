@@ -56,7 +56,6 @@ export async function fetchCryptoNews(): Promise<CryptoNewsResponse> {
   }
 
 
-  console.log('results array:', results);
   // Map and validate each news item
   const validatedResults = results.map((item: any) => ({
     id: item.id || Date.now(),
