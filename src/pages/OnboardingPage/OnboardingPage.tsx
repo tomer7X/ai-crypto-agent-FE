@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -37,7 +37,7 @@ const INVESTOR_TYPES = [
 
 
 export default function OnboardingPage({ onComplete }: Props) {
-  const { token } = useUserData();
+  const { token, preferences } = useUserData();
   const [assets, setAssets] = useState<string[]>([]);
   const [investorType, setInvestorType] = useState<string>("HODLer");
   const [content, setContent] = useState<{ [k: string]: boolean }>({
@@ -49,6 +49,22 @@ export default function OnboardingPage({ onComplete }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const savePrefs = useSavePreferencesMutation(token || "");
+
+  useEffect(() => {
+    if (preferences) {
+        console.log("Loaded existing preferences into onboarding:", preferences);
+      setAssets(preferences.currencies);
+      setInvestorType(preferences.investor_type);
+      const selectedContent = preferences.content.map((c) => c).reduce((acc, curr) => ({ ...acc, [curr]: true }), {});
+      setContent({
+        news: false,
+        charts: false,
+        social: false,
+        fun: false,
+        ...selectedContent
+    });
+    }
+  }, [preferences]);
 
   async function onSubmit(e?: React.FormEvent) {
     e?.preventDefault();

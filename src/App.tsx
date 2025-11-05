@@ -143,7 +143,7 @@ export default function App() {
         ) : null}
 
         {view === "home" && token ? (
-          <DashboardPage />
+          <DashboardPage onClickEditPreferences={() => setView("onboarding")} />
         ) : null}
       </div>
     </>

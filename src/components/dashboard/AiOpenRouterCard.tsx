@@ -8,8 +8,9 @@ const DEFAULT_MODEL = 'openrouter/auto';
 
 export function AiOpenRouterCard() {
   const { preferences } = useUserData();
-  const { ask, loading, output, error } = useOpenRouter();
+  const {ask, loading, output, error } = useOpenRouter();
   const model = DEFAULT_MODEL;
+
 
   const prompt = useMemo(() => {
     const investor = (preferences as any)?.investorType || 'crypto investor';
@@ -18,11 +19,13 @@ export function AiOpenRouterCard() {
   }, [preferences]);
 
   // Ask on mount and whenever the prompt changes (e.g., preferences updated)
+  // Use sessionStorage key to avoid double-invoke in React StrictMode (dev) causing duplicate calls.
   useEffect(() => {
-    // Avoid calling if already loading; fetch initial insight
-    if (!loading) {
-      ask(prompt, model);
-    }
+    if (!prompt) return;
+    const key = `aiInsightFetched:${prompt}`;
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, '1');
+    ask(prompt, model);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prompt]);
 
@@ -60,7 +63,7 @@ export function AiOpenRouterCard() {
           }}
           startIcon={loading ? <CircularProgress size={16} sx={{ color: '#fff' }} /> : undefined}
         >
-          {loading ? 'Fetching…' : 'New insight'}
+          {loading ? 'Fetching…' : 'Next insight'}
         </Button>
 
         {error && (

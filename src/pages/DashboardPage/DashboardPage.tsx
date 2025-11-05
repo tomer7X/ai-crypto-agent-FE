@@ -1,9 +1,9 @@
-import { Box } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import { useUserData } from '../../context/useUserDataProvider';
 import { LoadingDashboard, CoinsPricesCard, FunTimeCard, MarketNewsCard, AiOpenRouterCard } from '../../components/dashboard';
 
-export const DashboardPage = () => {
-  const { preferences } = useUserData();
+export const DashboardPage = ({ onClickEditPreferences }: { onClickEditPreferences: () => void }) => {
+  const { preferences, logout } = useUserData();
 
   if(!preferences) {
     return <LoadingDashboard />;
@@ -34,6 +34,49 @@ export const DashboardPage = () => {
           gap: 3,
         }}
       >
+        {/* Header actions */}
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1.5 }}>
+          <Button
+            variant="outlined"
+            onClick={onClickEditPreferences}
+            sx={{
+              borderRadius: 999,
+              textTransform: 'none',
+              color: '#ffffff',
+              borderColor: 'rgba(157,0,255,0.6)',
+              '&:hover': {
+                borderColor: '#9d00ff',
+                background: 'rgba(157,0,255,0.08)'
+              }
+            }}
+          >
+            Edit preferences
+          </Button>
+          <Button
+            variant="contained"
+            disableElevation
+            onClick={() => {
+              try {
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('TokenExpirationDate');
+              } catch {}
+              logout();
+              window.location.reload();
+            }}
+            sx={{
+              background: 'linear-gradient(135deg, #ff3b3b 0%, #b00020 100%)',
+              color: '#fff',
+              borderRadius: 999,
+              textTransform: 'none',
+              fontWeight: 600,
+              '&:hover': {
+                background: 'linear-gradient(135deg, #ff4d4d 0%, #c00028 100%)',
+              }
+            }}
+          >
+            Logout
+          </Button>
+        </Box>
         {/* Top Row */}
         <Box sx={{ display: 'flex', gap: 3, flex: 1 }}>
           <MarketNewsCard />

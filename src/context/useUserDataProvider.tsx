@@ -4,7 +4,7 @@ export type UserPreferences = {
   id: number;
   userId: number;
   currencies: string[];
-  investorType: string;
+  investor_type: string;
   content: string[];
 };
 
@@ -28,6 +28,8 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
     setToken,
     setPreferences,
     logout: () => {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("TokenExpirationDate");
       setToken(null);
       setPreferences(null);
     },
