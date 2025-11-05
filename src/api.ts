@@ -1,4 +1,8 @@
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_FALLBACK =
+  (import.meta as any).env?.VITE_API_BASE ||
+  (import.meta as any).env?.VITE_API_BASE_URL ||
+  'http://localhost:3000';
 
 export interface CryptoNewsItem {
   id: number;
@@ -151,6 +155,33 @@ export async function validateLogin(email: string, password: string) {
   }
 
   return res.json();
+}
+
+// =====================
+// AI - OpenRouter proxy
+// =====================
+
+export interface OpenRouterResponse {
+  source: 'openrouter';
+  model: string;
+  output: string;
+}
+
+export async function postOpenRouter(prompt: string, model: string = 'openrouter/auto'): Promise<OpenRouterResponse> {
+  const base = API_BASE || API_BASE_FALLBACK;
+  const res = await fetch(`${base}/api/ai/openrouter`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt, model }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => String(res.status));
+    throw new Error(`OpenRouter request failed: ${text}`);
+  }
+
+  const json = await res.json();
+  return json as OpenRouterResponse;
 }
 
 export interface CoinListItem {

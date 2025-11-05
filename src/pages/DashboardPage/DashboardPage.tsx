@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import { useUserData } from '../../context/useUserDataProvider';
-import { LoadingDashboard, CoinsPricesCard, FunTimeCard, MarketNewsCard, SocialCard } from '../../components/dashboard';
+import { LoadingDashboard, CoinsPricesCard, FunTimeCard, MarketNewsCard, AiOpenRouterCard } from '../../components/dashboard';
 
 export const DashboardPage = () => {
   const { preferences } = useUserData();
@@ -42,7 +42,7 @@ export const DashboardPage = () => {
 
         {/* Bottom Row */}
         <Box sx={{ display: 'flex', gap: 3, flex: 1 }}>
-          <SocialCard />
+          <AiOpenRouterCard />
           <FunTimeCard />
         </Box>
       </Box>
