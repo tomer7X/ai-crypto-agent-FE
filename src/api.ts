@@ -2,12 +2,12 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 export interface CryptoNewsItem {
   id: number;
+  slug: string;
   title: string;
+  description: string;
   published_at: string;
-  url: string;
-  source: string;
-  currencies?: { code: string; title: string }[];
-  votes?: { positive: number; negative: number; important: number };
+  created_at: string;
+  kind: string;
 }
 
 export interface CryptoNewsResponse {
@@ -56,15 +56,16 @@ export async function fetchCryptoNews(): Promise<CryptoNewsResponse> {
   }
 
 
+  console.log('results array:', results);
   // Map and validate each news item
   const validatedResults = results.map((item: any) => ({
-    id: item.id || Date.now(), // Fallback to timestamp if no ID
+    id: item.id || Date.now(),
+    slug: item.slug || '',
     title: item.title || 'Untitled',
+    description: item.description || 'No description available',
     published_at: item.published_at || new Date().toISOString(),
-    url: item.url || '#',
-    source: item.source || 'Unknown Source',
-    currencies: Array.isArray(item.currencies) ? item.currencies : [],
-    votes: item.votes || { positive: 0, negative: 0, important: 0 }
+    created_at: item.created_at || item.published_at || new Date().toISOString(),
+    kind: item.kind || 'news'
   }));
 
   return {
