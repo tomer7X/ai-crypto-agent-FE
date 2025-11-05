@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Typography } from "@mui/material";
+// import { Box } from "@mui/material";
 import LoginPage from "./pages/LoginPage/LoginPage.tsx";
 import RegisterPage from "./pages/RegisterPage/RegisterPage.tsx";
 import { getPreferences } from './api';
@@ -7,6 +7,7 @@ import { usePreferencesQuery } from './hooks/queries';
 import OnboardingPage from "./pages/OnboardingPage/OnboardingPage.tsx";
 import { DashboardPage } from "./pages/DashboardPage/DashboardPage.tsx";
 import Particles from './Particles';
+import LoadingDashboard from './components/LoadingDashboard';
 
 export type Pages = "login" | "register" | "onboarding" | "home";
 
@@ -106,9 +107,7 @@ export default function App() {
         {view === "home" && token && preferences ? (
           <DashboardPage token={token} preferences={preferences}/>
         ) : view === "home" ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-            <Typography color="white" variant="h6">Loading dashboard...</Typography>
-          </Box>
+          <LoadingDashboard />
         ) : null}
       </div>
     </>

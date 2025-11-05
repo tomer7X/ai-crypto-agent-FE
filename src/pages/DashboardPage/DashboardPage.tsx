@@ -12,8 +12,6 @@ preferences,
     token: string
     preferences: Preferences
 }) => {
-    console.log("DashboardPage preferences:", preferences);
-    console.log("DashboardPage token:", token);
     
     if (!preferences || !preferences.content) {
         return (
