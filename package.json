@@ -11,7 +11,6 @@
   },
   "dependencies": {
   "@tanstack/react-query": "^5.59.18",
-  "@tanstack/react-query-devtools": "^5.59.18",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.3.4",

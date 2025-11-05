@@ -8,6 +8,8 @@ const DEFAULT_MODEL = 'openrouter/auto';
 
 export function AiOpenRouterCard() {
   const { preferences } = useUserData();
+
+  if(!preferences || !preferences.content?.includes('AI')) return null;
   const {ask, loading, output, error } = useOpenRouter();
   const model = DEFAULT_MODEL;
 
