@@ -9,7 +9,8 @@ import {
   Typography,
   Link,
 } from "@mui/material";
-import { createAccount } from "../../api";
+// import { createAccount } from "../../api";
+import { useRegisterMutation } from "../../hooks/queries";
 
 type Props = {
   onSwitchToLogin?: () => void;
@@ -25,6 +26,7 @@ export default function RegisterPage({ onSwitchToLogin }: Props) {
   const [errors, setErrors] = useState<{ fullName?: string; email?: string; password?: string; confirm?: string }>({});
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const registerMutation = useRegisterMutation();
 
   function validate() {
     const next: typeof errors = {};
@@ -51,7 +53,7 @@ export default function RegisterPage({ onSwitchToLogin }: Props) {
     setSubmitting(true);
     try {
       console.log("Register payload:", { fullName, email });
-      await createAccount(fullName, email, password);
+      await registerMutation.mutateAsync({ fullName, email, password });
       setMessage("✅ Account created — you can now sign in");
       setTimeout(() => {
         navigateToLogin();

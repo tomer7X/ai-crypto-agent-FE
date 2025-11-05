@@ -1,8 +1,9 @@
-import { Box, Typography, Link, CircularProgress, IconButton } from '@mui/material';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { Box, Typography, CircularProgress, IconButton } from '@mui/material';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { FloatingCard } from '../FloatingCard';
 import type { Preferences } from '../../App';
-import { fetchCryptoNews, type CryptoNewsItem } from '../../api';
+import type { CryptoNewsItem } from '../../api';
+import { useCryptoNewsQuery } from '../../hooks/queries';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
@@ -11,54 +12,10 @@ interface MarketNewsCardProps {
 }
 
 export const MarketNewsCard = ({ preferences }: MarketNewsCardProps) => {
-  const [news, setNews] = useState<CryptoNewsItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data, isLoading, isError, error } = useCryptoNewsQuery();
+  const news: CryptoNewsItem[] = data?.results ?? [];
   const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
   const autoScrollInterval = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
-
-  useEffect(() => {
-    let mounted = true;
-
-    const loadNews = async () => {
-      if (!mounted) return;
-      
-      try {
-        console.log("Fetching crypto news...");
-        setLoading(true);
-        setError(null);
-        
-        const response = await fetchCryptoNews();
-        console.log("Received news response:", response);
-        
-        if (!mounted) return;
-        
-        if (!response || !Array.isArray(response.results)) {
-          throw new Error('Invalid news response format');
-        }
-        
-        setNews(response.results);
-        console.log("News state updated with", response.results.length, "items");
-      } catch (err) {
-        console.error("Error loading news:", err);
-        if (mounted) {
-          setError(err instanceof Error ? err.message : 'Failed to fetch news');
-        }
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    loadNews();
-    // Refresh news every 5 minutes
-    const fetchInterval = setInterval(loadNews, 5 * 60 * 1000);
-    return () => {
-      mounted = false;
-      clearInterval(fetchInterval);
-    };
-  }, []);
 
   // Auto-scroll news every 5 seconds
   useEffect(() => {
@@ -96,14 +53,14 @@ export const MarketNewsCard = ({ preferences }: MarketNewsCardProps) => {
   return (
     <FloatingCard title="Market News" sx={{ height: '100%', minHeight: '45vh' }}>
       <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
-        {loading ? (
+        {isLoading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flex: 1 }}>
             <CircularProgress sx={{ color: 'white' }} />
           </Box>
-        ) : error ? (
+        ) : isError ? (
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
             <Typography color="error" variant="body2">
-              {error}
+              {(error as Error)?.message ?? 'Failed to fetch news'}
             </Typography>
           </Box>
         ) : news.length === 0 ? (

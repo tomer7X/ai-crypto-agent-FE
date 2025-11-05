@@ -17,7 +17,8 @@ import {
   Typography,
   Autocomplete,
 } from "@mui/material";
-import { putPreferences } from "../../api";
+// import { putPreferences } from "../../api";
+import { useSavePreferencesMutation } from "../../hooks/queries";
 
 type Props = {
   onComplete?: () => void;
@@ -46,6 +47,7 @@ export default function OnboardingPage({ onComplete, token }: Props) {
   });
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const savePrefs = useSavePreferencesMutation(token || "");
 
   async function onSubmit(e?: React.FormEvent) {
     e?.preventDefault();
@@ -59,7 +61,7 @@ export default function OnboardingPage({ onComplete, token }: Props) {
 
     try {
       if (token) {
-        await putPreferences(token, {
+        await savePrefs.mutateAsync({
           currencies: assets,
           investor_type: investorType,
           content: selectedContent,

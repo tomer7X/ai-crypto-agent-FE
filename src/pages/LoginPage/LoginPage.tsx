@@ -12,7 +12,8 @@ import {
   Typography,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { validateLogin } from "../../api";
+// import { validateLogin } from "../../api";
+import { useLoginMutation } from "../../hooks/queries";
 
 type FormState = {
   email: string;
@@ -37,6 +38,7 @@ export const Login = ({ onSwitchToRegister, onLogin }: Props) => {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const loginMutation = useLoginMutation();
 
   function validate() {
     const next: typeof errors = {};
@@ -53,7 +55,7 @@ export const Login = ({ onSwitchToRegister, onLogin }: Props) => {
     if (!validate()) return;
     setSubmitting(true);
     try {
-      const response = await validateLogin(form.email, form.password);
+      const response = await loginMutation.mutateAsync({ email: form.email, password: form.password });
       console.log("Login response:", response);
       setMessage("✅ Logged in successfully");
       // extract token from response (support common keys)
