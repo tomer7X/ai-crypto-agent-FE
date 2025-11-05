@@ -1,5 +1,6 @@
 import { useQuery, useMutation, type UseMutationOptions } from '@tanstack/react-query';
 import { fetchCryptoNews, getPreferences, putPreferences, createAccount, validateLogin } from '../api';
+import { fetchCoinPrices, type CoinPricesMap } from '../api';
 
 // News
 export function useCryptoNewsQuery() {
@@ -38,6 +39,19 @@ export function useRegisterMutation(options?: UseMutationOptions<any, Error, { f
   });
 }
 
+// Coin prices
+export function useCoinPricesQuery(symbols: string[], enabled: boolean = symbols.length > 0) {
+  // keep key stable by sorting symbols
+  const key = [...symbols].map((s) => s.toLowerCase()).sort();
+  return useQuery<CoinPricesMap>({
+    queryKey: ['coinPrices', key],
+    queryFn: () => fetchCoinPrices(key),
+    enabled,
+    staleTime: 15 * 1000,
+    refetchInterval: 30 * 1000,
+    refetchOnWindowFocus: false,
+  });
+}
 export function useLoginMutation(options?: UseMutationOptions<any, Error, { email: string; password: string }>) {
   return useMutation<any, Error, { email: string; password: string }>({
     mutationKey: ['login'],

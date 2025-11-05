@@ -152,3 +152,75 @@ export async function validateLogin(email: string, password: string) {
 
   return res.json();
 }
+
+export interface CoinListItem {
+  id: string;
+  symbol: string;
+  name: string;
+  platforms?: Record<string, string>;
+}
+export type CoinPricesMap = Record<string, number>; // key: symbol lowercase, value: price in USD (best-effort)
+
+function normalizePriceValue(v: any): number | null {
+  if (v == null) return null;
+  if (typeof v === 'number') return v;
+  if (typeof v === 'string') {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+  if (typeof v === 'object') {
+    if (typeof v.price === 'number') return v.price;
+    if (typeof v.price_usd === 'number') return v.price_usd;
+    if (typeof v.usd === 'number') return v.usd;
+    if (typeof v.value === 'number') return v.value;
+  }
+  return null;
+}
+
+/**
+ * Fetch coin prices for a list of symbols via backend: GET /api/coins?symbols=btc,ETH
+ * Returns a map of symbol(lowercase) -> price number (USD best-effort).
+ */
+export async function fetchCoinPrices(symbols: string[]): Promise<CoinPricesMap> {
+  if (!API_BASE) throw new Error('API_BASE_URL not configured');
+  const unique = Array.from(new Set(symbols.filter(Boolean)));
+  if (unique.length === 0) return {};
+
+  const url = new URL(`${API_BASE}/api/coins`);
+  url.searchParams.set('symbols', unique.join(','));
+
+  const res = await fetch(url.toString(), {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Failed to fetch coin prices: ${text}`);
+  }
+
+  const raw = await res.json();
+
+  const out: CoinPricesMap = {};
+  const tryAssign = (sym: string, val: any) => {
+    const price = normalizePriceValue(val);
+    if (price != null) out[sym.toLowerCase()] = price;
+  };
+
+  if (Array.isArray(raw)) {
+    for (const item of raw) {
+      const sym = (item?.symbol ?? item?.ticker ?? '').toString();
+      if (!sym) continue;
+      tryAssign(sym, item);
+    }
+  } else if (raw && typeof raw === 'object') {
+    const data = (raw as any).data ?? (raw as any).prices ?? raw;
+    if (data && typeof data === 'object') {
+      for (const [k, v] of Object.entries<any>(data)) {
+        tryAssign(k, v);
+      }
+    }
+  }
+
+  return out;
+}

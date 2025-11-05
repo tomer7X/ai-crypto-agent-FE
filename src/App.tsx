@@ -7,7 +7,6 @@ import OnboardingPage from "./pages/OnboardingPage/OnboardingPage.tsx";
 import { DashboardPage } from "./pages/DashboardPage/DashboardPage.tsx";
 import Particles from './Particles';
 import { useUserData } from './context/useUserDataProvider';
-import LoadingDashboard from './components/LoadingDashboard';
 import { useQueryClient } from '@tanstack/react-query';
 import { Typography } from "@mui/material";
 
@@ -23,7 +22,7 @@ export interface Preferences {
 
 export default function App() {
   const [view, setView] = useState<Pages>("login");
-  const { token, setToken, preferences, setPreferences } = useUserData();
+  const { token, setToken, setPreferences } = useUserData();
   const queryClient = useQueryClient();
 
   // React Query: load preferences when token exists
@@ -104,15 +103,15 @@ export default function App() {
             Crypto AI Agent
           </Typography>
       )}
-        {view === "login" && (
+        {view === "login" ? (
           <LoginPage onSwitchToRegister={() => setView("register")} onLogin={(jwt) => handleLogin(jwt)} />
-        )}
+        ) : null}
 
-        {view === "register" && (
+        {view === "register" ? (
           <RegisterPage onSwitchToLogin={() => setView("login")} />
-        )}
+        ): null}
 
-        {view === "onboarding" && (
+        {view === "onboarding" ? (
           <OnboardingPage
             onComplete={async () => {
               // Navigate to home first to show the LoadingDashboard immediately
@@ -124,12 +123,10 @@ export default function App() {
               }
             }}
           />
-        )}
+        ) : null}
 
-        {view === "home" && token && preferences ? (
+        {view === "home" && token ? (
           <DashboardPage />
-        ) : view === "home" ? (
-          <LoadingDashboard />
         ) : null}
       </div>
     </>

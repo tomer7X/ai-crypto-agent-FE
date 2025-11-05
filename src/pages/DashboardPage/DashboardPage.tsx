@@ -1,10 +1,14 @@
 import { Box } from '@mui/material';
-import { MarketNewsCard } from '../../components/dashboard/MarketNewsCard';
-import { CoinsPricesCard } from '../../components/dashboard/CoinsPricesCard';
-import { SocialCard } from '../../components/dashboard/SocialCard';
-import { FunTimeCard } from '../../components/dashboard/FunTimeCard';
+import { useUserData } from '../../context/useUserDataProvider';
+import { LoadingDashboard, CoinsPricesCard, FunTimeCard, MarketNewsCard, SocialCard } from '../../components/dashboard';
 
 export const DashboardPage = () => {
+  const { preferences } = useUserData();
+
+  if(!preferences) {
+    return <LoadingDashboard />;
+  }
+
   return (
     <Box
       sx={{
@@ -32,13 +36,13 @@ export const DashboardPage = () => {
       >
         {/* Top Row */}
         <Box sx={{ display: 'flex', gap: 3, flex: 1 }}>
-          <MarketNewsCard/>
-          <CoinsPricesCard/>
+          <MarketNewsCard />
+          <CoinsPricesCard />
         </Box>
 
         {/* Bottom Row */}
         <Box sx={{ display: 'flex', gap: 3, flex: 1 }}>
-          <SocialCard  />
+          <SocialCard />
           <FunTimeCard />
         </Box>
       </Box>
