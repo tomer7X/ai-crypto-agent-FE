@@ -19,10 +19,10 @@ import {
 } from "@mui/material";
 // import { putPreferences } from "../../api";
 import { useSavePreferencesMutation } from "../../hooks/queries";
+import { useUserData } from "../../context/useUserDataProvider";
 
 type Props = {
   onComplete?: () => void;
-  token?: string;
 };
 
 const ASSETS_OPTIONS = ["BTC", "ETH", "SOL", "ADA", "DOT"];
@@ -36,7 +36,8 @@ const INVESTOR_TYPES = [
 ];  
 
 
-export default function OnboardingPage({ onComplete, token }: Props) {
+export default function OnboardingPage({ onComplete }: Props) {
+  const { token } = useUserData();
   const [assets, setAssets] = useState<string[]>([]);
   const [investorType, setInvestorType] = useState<string>("HODLer");
   const [content, setContent] = useState<{ [k: string]: boolean }>({

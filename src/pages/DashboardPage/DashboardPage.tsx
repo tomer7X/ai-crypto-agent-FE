@@ -1,17 +1,12 @@
 import { Box, Typography } from '@mui/material';
-import type { Preferences } from '../../App';
 import { MarketNewsCard } from '../../components/dashboard/MarketNewsCard';
 import { CoinsPricesCard } from '../../components/dashboard/CoinsPricesCard';
 import { SocialCard } from '../../components/dashboard/SocialCard';
 import { FunTimeCard } from '../../components/dashboard/FunTimeCard';
+import { useUserData } from '../../context/useUserDataProvider';
 
-export const DashboardPage = ({
-token,
-preferences,
-}:{
-    token: string
-    preferences: Preferences
-}) => {
+export const DashboardPage = () => {
+  const { preferences } = useUserData();
     
     if (!preferences || !preferences.content) {
         return (

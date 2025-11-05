@@ -2,12 +2,14 @@ import { useState, useEffect } from "react";
 // import { Box } from "@mui/material";
 import LoginPage from "./pages/LoginPage/LoginPage.tsx";
 import RegisterPage from "./pages/RegisterPage/RegisterPage.tsx";
-import { getPreferences } from './api';
 import { usePreferencesQuery } from './hooks/queries';
 import OnboardingPage from "./pages/OnboardingPage/OnboardingPage.tsx";
 import { DashboardPage } from "./pages/DashboardPage/DashboardPage.tsx";
 import Particles from './Particles';
+import { useUserData } from './context/useUserDataProvider';
 import LoadingDashboard from './components/LoadingDashboard';
+import { useQueryClient } from '@tanstack/react-query';
+import { Typography } from "@mui/material";
 
 export type Pages = "login" | "register" | "onboarding" | "home";
 
@@ -21,8 +23,8 @@ export interface Preferences {
 
 export default function App() {
   const [view, setView] = useState<Pages>("login");
-  const [token, setToken] = useState<string | null>(null);
-  const [preferences, setPreferences] = useState<Preferences | null>(null);
+  const { token, setToken, preferences, setPreferences } = useUserData();
+  const queryClient = useQueryClient();
 
   // React Query: load preferences when token exists
   const { data: prefsData, isLoading: prefsLoading } = usePreferencesQuery(token || undefined, !!token);
@@ -61,7 +63,7 @@ export default function App() {
 
   return (
     <>
-    <div style={{ width: '100%', height: '100vh', position: 'fixed', top: 0, left: 0, backgroundColor: '#121212ff' }}>
+      <div style={{ width: '100%', height: '100vh', position: 'fixed', top: 0, left: 0, backgroundColor: '#121212ff' }}>
         <Particles
           particleColors={["#9d00ffff", "#9d00ffff"]}
           particleCount={2000}
@@ -75,6 +77,33 @@ export default function App() {
       </div>
 
       <div style={{ position: 'relative', zIndex: 2, width: '100%', minHeight: '100vh' }}>
+      {(view === "login" || view === "register") && (
+        <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 600,
+              letterSpacing: '0.4px',
+              mb: 1,
+              zIndex: 99,
+              background: 'linear-gradient(90deg, #50008aff, #1e024dff, #7c4dff, #ffffff)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundSize: '300% 100%',
+              animation: 'lg-shift 3s ease-in-out infinite',
+              '@keyframes lg-shift': {
+                '0%': { backgroundPosition: '0% 50%' },
+                '50%': { backgroundPosition: '100% 50%' },
+                '100%': { backgroundPosition: '0% 50%' },
+              },
+              fontSize: "100px",
+              fontFamily: "fantasy",
+              textAlign: 'center',
+              paddingTop: '20px',
+            }}
+          >
+            Crypto AI Agent
+          </Typography>
+      )}
         {view === "login" && (
           <LoginPage onSwitchToRegister={() => setView("register")} onLogin={(jwt) => handleLogin(jwt)} />
         )}
@@ -84,28 +113,21 @@ export default function App() {
         )}
 
         {view === "onboarding" && (
-          <OnboardingPage token={token || undefined} onComplete={async () => {
-            // after onboarding completes, try to fetch preferences (if token available) or read local saved
-            if (token) {
-              try {
-                const prefs = await getPreferences(token);
-                if (prefs && prefs.preferences) {
-                  setPreferences(prefs.preferences);
-                } else {
-                  console.warn('No preferences found after onboarding');
-                  return;
-                }
-              } catch (err) {
-                console.warn('Could not fetch preferences after onboarding', err);
-                return;
+          <OnboardingPage
+            onComplete={async () => {
+              // Navigate to home first to show the LoadingDashboard immediately
+              setView("home");
+              // Then refresh preferences via React Query (don't await so loader shows during fetch)
+              if (token) {
+                queryClient.invalidateQueries({ queryKey: ['preferences', token] });
+                queryClient.refetchQueries({ queryKey: ['preferences', token] });
               }
-            }
-            setView("home");
-          }} />
+            }}
+          />
         )}
 
         {view === "home" && token && preferences ? (
-          <DashboardPage token={token} preferences={preferences}/>
+          <DashboardPage />
         ) : view === "home" ? (
           <LoadingDashboard />
         ) : null}
