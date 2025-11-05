@@ -1,7 +1,7 @@
 import { Box, Typography } from '@mui/material';
 import type { Preferences } from '../../App';
 import { MarketNewsCard } from '../../components/dashboard/MarketNewsCard';
-import { ChartsCard } from '../../components/dashboard/ChartsCard';
+import { CoinsPricesCard } from '../../components/dashboard/CoinsPricesCard';
 import { SocialCard } from '../../components/dashboard/SocialCard';
 import { FunTimeCard } from '../../components/dashboard/FunTimeCard';
 
@@ -50,7 +50,7 @@ preferences,
         {/* Top Row */}
         <Box sx={{ display: 'flex', gap: 3, flex: 1 }}>
           <MarketNewsCard preferences={preferences} />
-          <ChartsCard preferences={preferences} />
+          <CoinsPricesCard preferences={preferences} />
         </Box>
 
         {/* Bottom Row */}

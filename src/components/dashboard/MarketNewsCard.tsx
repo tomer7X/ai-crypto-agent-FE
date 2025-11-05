@@ -122,25 +122,40 @@ export const MarketNewsCard = ({ preferences }: MarketNewsCardProps) => {
               p: 2,
               transition: 'opacity 0.3s ease-in-out',
             }}>
-              <Link
-                href={news[currentNewsIndex].url}
-                target="_blank"
-                rel="noopener noreferrer"
-                sx={{
-                  color: 'white',
-                  textDecoration: 'none',
-                  mb: 1,
-                  '&:hover': {
-                    textDecoration: 'underline',
-                    color: 'rgba(255, 255, 255, 0.9)',
-                  },
-                }}
-              >
-                {news[currentNewsIndex].title}
-              </Link>
-              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                {new Date(news[currentNewsIndex].published_at).toLocaleString()} • {news[currentNewsIndex].source}
-              </Typography>
+              <Box sx={{ mb: 2 }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    color: 'white',
+                    textDecoration: 'none',
+                    mb: 1,
+                    '&:hover': {
+                      textDecoration: 'underline',
+                      cursor: 'pointer',
+                      color: 'rgba(255, 255, 255, 0.9)',
+                    },
+                  }}
+                >
+                  {news[currentNewsIndex].title}
+                </Typography>
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    color: 'rgba(255,255,255,0.9)',
+                    mb: 1,
+                    display: '-webkit-box',
+                    WebkitBoxOrient: 'vertical',
+                    WebkitLineClamp: 3,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}
+                >
+                  {news[currentNewsIndex].description}
+                </Typography>
+                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                  {new Date(news[currentNewsIndex].published_at).toLocaleString()}
+                </Typography>
+              </Box>
             </Box>
             
             <Box sx={{ 
